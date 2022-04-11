@@ -1,0 +1,52 @@
+<?php 
+
+$path = $argv[1];
+$depth = $argv[2];
+$meta = ["fileCount" => 0, "dirCount" => 0];
+$meta = tree($path,0,$depth,$meta, !is_null($depth), !is_int($depth));
+
+echo "Файлов: ".$meta['fileCount']."\n";
+echo "Папок: ".$meta['dirCount']."\n";
+
+function strRepeat($str,$count) {
+	$origin = "";
+	for ($i=0;$i < $count; $i++) {
+		$origin  = $origin.$str;
+	}
+
+	return $origin;
+}
+
+function echoItem($count, $item) {
+	echo strRepeat("    ", $count)."|______ $item"."=\n";
+}
+
+
+function tree($path,$currentDepth,$depth, $meta, $checkDept, $checkDept2) {
+	if ($checkDept) {
+		if ($checkDept2) {
+			echo "Вы ввели некорректное значение \n";
+		}
+		if ($depth <= $currentDepth) {
+			return $meta;
+		}
+
+	}
+
+	$dirs = scandir($path);
+	foreach ($dirs as $item) {
+		if (($item == '.') || ($item == '..')) continue;	
+		$full_path = $path."/".$item;
+		if (is_dir($full_path)) {
+			echoItem($currentDepth, $item);
+			$meta['dirCount']++;
+			$meta = tree($full_path,$currentDepth+1,$depth,$meta, $checkDept);
+			
+		}
+		else { echoItem($currentDepth, $item);
+			   $meta['fileCount']++;}
+    } 
+    return $meta;
+}
+
+
